@@ -3,4 +3,8 @@
 /config/repository_aliases.yml
 /config/repository_config.yml
 
+# ignore Pry's config file
 .pryrc
+
+# Ignore all emacs backup files
+*~
