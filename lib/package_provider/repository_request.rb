@@ -40,10 +40,8 @@ module PackageProvider
 
       def errors
         errors = []
-        errors << 'Source is missing' unless source_valid?
-        unless destination_valid?
-          errors << 'Destination can\'t start with / or \\'
-        end
+        errors << source_errors
+        errors << destinaton_errors
         errors unless errors.empty?
       end
 
@@ -54,12 +52,50 @@ module PackageProvider
 
       private
 
+      def destinaton_errors
+        return unless destination_valid?
+        errors = []
+
+        unless destination_start_valid?
+          errors << 'Destination can not start with / or \\'
+        end
+
+        unless path_valid?(destination)
+          errors << 'Destination can not contain // or \\\\'
+        end
+
+        errors
+      end
+
+      def source_errors
+        errors = []
+        errors << 'Source is missing' unless source_present?
+
+        unless path_valid?(source)
+          errors << 'Source can not contain // or \\\\'
+        end
+
+        errors
+      end
+
       def destination_valid?
+        destination_start_valid? && path_valid?(destination)
+      end
+
+      def destination_start_valid?
         !destination.to_s.start_with?('/', '\\')
       end
 
       def source_valid?
+        source_present? && path_valid?(source)
+      end
+
+      def source_present?
         !source.to_s.empty?
+      end
+
+      def path_valid?(path)
+        !(path.to_s.include?('//') || path.to_s.include?('\\\\'))
       end
     end
 
