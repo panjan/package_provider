@@ -40,9 +40,9 @@ module PackageProvider
 
       def errors
         errors = []
-        errors << source_errors
-        errors << destinaton_errors
-        errors unless errors.empty?
+        errors.concat source_errors unless source_errors.empty?
+        errors.concat destinaton_errors unless destinaton_errors.empty?
+        errors
       end
 
       def to_tsd
@@ -53,15 +53,14 @@ module PackageProvider
       private
 
       def destinaton_errors
-        return unless destination_valid?
         errors = []
 
         unless destination_start_valid?
-          errors << 'Destination can not start with / or \\'
+          errors << 'Destination can not start with \\ or /'
         end
 
         unless path_valid?(destination)
-          errors << 'Destination can not contain // or \\\\'
+          errors << 'Destination can not contain \\\\ or //'
         end
 
         errors
@@ -70,11 +69,7 @@ module PackageProvider
       def source_errors
         errors = []
         errors << 'Source is missing' unless source_present?
-
-        unless path_valid?(source)
-          errors << 'Source can not contain // or \\\\'
-        end
-
+        errors << 'Source can not contain \\\\ or //' unless path_valid?(source)
         errors
       end
 
